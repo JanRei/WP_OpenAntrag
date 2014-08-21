@@ -47,7 +47,7 @@ class Widget extends \WP_Widget {
     public function update( $new_instance, $old_instance ) {
         $instance['id'] = strip_tags( $new_instance['id'] );
         if (empty($instance['id'])) {
-            throw new \Exception(__('Parlament darf nicht leer sein', 'wp_openantrag'));
+            // TODO throw new \Exception(__('Parlament darf nicht leer sein', 'wp_openantrag'));
         }
         $instance['count'] = strip_tags( $new_instance['id']);
         if (!is_numeric($instance['count'])) {
@@ -57,7 +57,37 @@ class Widget extends \WP_Widget {
     }
 
     public function widget( $args, $instance ) {
-        echo '<b>NRW</b>';
+        extract($args);
+        echo $before_widget;
+
+        $url = sprintf('http://openantrag.de/api/representation/GetByKey/%s', $instance['id']);
+        $rep = json_decode(wp_remote_retrieve_body(wp_remote_get($url)));
+        echo $before_title;
+        echo 'Antr&auml;ge<br/>';
+        echo esc_html($rep->Name2);
+        echo $after_title;
+
+        echo '<ul>';
+        $url = sprintf('http://openantrag.de/api/proposal/%s/GetTop/%d', $instance['id'], $instance['count']);
+        $proposals = json_decode(wp_remote_retrieve_body(wp_remote_get($url)));
+        foreach($proposals as $prop) {
+            $status = '';
+            $color = '';
+            $statusid = $prop->ID_CurrentProposalStep;
+            foreach($prop->ProposalSteps as $step) {
+                if ($step->ID_ProcessStep == $statusid) {
+                    $status = $step->ProcessStep->ShortCaption;
+                    $color = $step->ProcessStep->Color;
+                }
+            }
+            echo '<li style="margin-bottom: 5px;">';
+            echo '<a href="' . $prop->FullUrl . '" target="_blank">' . $prop->Title . '</a>';
+            echo '<br/>';
+            echo '<span ' .(empty($color)?'':'style="color: '.$color.'"'). '>'. $status . '</span>';
+            echo '</li>';
+        }
+        echo '</ul>';
+        echo $after_widget;
     }
 }
 
