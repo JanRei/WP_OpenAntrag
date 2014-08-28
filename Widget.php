@@ -49,7 +49,7 @@ class Widget extends \WP_Widget {
         if (empty($instance['id'])) {
             // TODO throw new \Exception(__('Parlament darf nicht leer sein', 'wp_openantrag'));
         }
-        $instance['count'] = strip_tags( $new_instance['id']);
+        $instance['count'] = strip_tags( $new_instance['count']);
         if (!is_numeric($instance['count'])) {
             $instance['count'] = 5;
         }
@@ -75,15 +75,19 @@ class Widget extends \WP_Widget {
             $color = '';
             $statusid = $prop->ID_CurrentProposalStep;
             foreach($prop->ProposalSteps as $step) {
-                if ($step->ID_ProcessStep == $statusid) {
-                    $status = $step->ProcessStep->ShortCaption;
+                if ($step->Id == $statusid) {
+                    $status = $step->ProcessStep->Caption;
                     $color = $step->ProcessStep->Color;
                 }
             }
-            echo '<li style="margin-bottom: 5px;">';
+            echo '<li style="margin-bottom: 5px; ';
+            if (!empty($color)) {
+                echo 'background-color: '.$color.';';
+            }
+            echo '">';
             echo '<a href="' . $prop->FullUrl . '" target="_blank">' . $prop->Title . '</a>';
             echo '<br/>';
-            echo '<span ' .(empty($color)?'':'style="color: '.$color.'"'). '>'. $status . '</span>';
+            echo '<span>'. $status . '</span>';
             echo '</li>';
         }
         echo '</ul>';
