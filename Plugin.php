@@ -11,8 +11,7 @@ namespace WP_OpenAntrag;
 
 class Plugin
 {
-    const API_HOST = 'http://openantrag.de';
-    const API_PORT = 80;
+    const API_HOST = 'http://openantrag.de/api';
 
     public static function init()
     {
@@ -67,7 +66,7 @@ class Plugin
     public static function log($debug)
     {
         if(defined('WP_DEBUG_LOG') && WP_DEBUG_LOG)
-            error_log(print_r(compact('wo_openantrag_debug'),1)); //send message to debug.log when in debug mode
+            error_log(print_r(compact('wp_openantrag_debug'),1)); //send message to debug.log when in debug mode
     }
 
     private static function bail_on_activation( $message, $deactivate = true ) {
@@ -95,10 +94,10 @@ class Plugin
 <?php
         if ( $deactivate ) {
             $plugins = get_option( 'active_plugins' );
-            $akismet = plugin_basename( AKISMET__PLUGIN_DIR . 'akismet.php' );
+            $openantrag = plugin_basename( WP_OPENANTRAG__PLUGIN_DIR . 'akismet.php' );
             $update  = false;
             foreach ( $plugins as $i => $plugin ) {
-                if ( $plugin === $akismet ) {
+                if ( $plugin === $openantrag ) {
                     $plugins[$i] = false;
                     $update = true;
                 }

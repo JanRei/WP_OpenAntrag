@@ -17,7 +17,7 @@ class Widget extends \WP_Widget {
         parent::__construct(
             'wp_openantrag_widget',
             __( 'WP OpenAntrag Widget' , 'wp_openantrag'),
-            array( 'description' => __( 'Zeige Anträge aus dem jeweiligen OpenAntrag-Parlament an.' , 'wp_openantrag') )
+            array( 'description' => __( 'Zeige Antr&auml;ge aus dem jeweiligen OpenAntrag-Parlament an.' , 'wp_openantrag') )
         );
     }
 
@@ -60,15 +60,16 @@ class Widget extends \WP_Widget {
         extract($args);
         echo $before_widget;
 
-        $url = sprintf('http://openantrag.de/api/representation/GetByKey/%s', $instance['id']);
+        $url = sprintf('%s/representation/GetByKey/%s', Plugin::API_HOST, $instance['id']);
         $rep = json_decode(wp_remote_retrieve_body(wp_remote_get($url)));
         echo $before_title;
-        echo 'Antr&auml;ge<br/>';
+        echo __('Antr&auml;ge');
+        echo '<br/>';
         echo esc_html($rep->Name2);
         echo $after_title;
 
         echo '<ul>';
-        $url = sprintf('http://openantrag.de/api/proposal/%s/GetTop/%d', $instance['id'], $instance['count']);
+        $url = sprintf('%s/proposal/%s/GetTop/%d', Plugin::API_HOST, $instance['id'], $instance['count']);
         $proposals = json_decode(wp_remote_retrieve_body(wp_remote_get($url)));
         foreach($proposals as $prop) {
             $status = '';
@@ -80,7 +81,7 @@ class Widget extends \WP_Widget {
                     $color = $step->ProcessStep->Color;
                 }
             }
-            echo '<li style="margin-bottom: 5px; ';
+            echo '<li style="margin: 3px; border-radius: 2px 2px 2px 2px; padding: 5px; border-style: none ridge inset none; border-width: 1px; border-color: grey; ';
             if (!empty($color)) {
                 echo 'background-color: '.$color.';';
             }
