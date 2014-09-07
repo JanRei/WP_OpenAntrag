@@ -32,16 +32,7 @@ class Widget extends \WP_Widget {
         } else {
             $count = 5;
         }
-?>
-    <p>
-        <label for="<?php echo $this->get_field_id( 'id' ); ?>"><?php esc_html_e( 'Parlament:' , 'wp_openantrag'); ?></label>
-        <input class="widefat" id="<?php echo $this->get_field_id( 'id' ); ?>" name="<?php echo $this->get_field_name( 'id' ); ?>" type="text" value="<?php echo esc_attr( $id ); ?>" />
-    </p>
-    <p>
-        <label for="<?php echo $this->get_field_id( 'count' ); ?>"><?php esc_html_e( 'Anzahl Antr&auml;ge:' , 'wp_openantrag'); ?></label>
-        <input class="widefat" id="<?php echo $this->get_field_id( 'count' ); ?>" name="<?php echo $this->get_field_name( 'count' ); ?>" type="text" value="<?php echo esc_attr( $count ); ?>" />
-    </p>
-<?php
+        include dirname(__FILE__) . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . 'widget_form.php';
     }
 
     public function update( $new_instance, $old_instance ) {
@@ -62,37 +53,28 @@ class Widget extends \WP_Widget {
 
         $url = sprintf('%s/representation/GetByKey/%s', Plugin::API_HOST, $instance['id']);
         $rep = json_decode(wp_remote_retrieve_body(wp_remote_get($url)));
-        echo $before_title;
-        echo __('Antr&auml;ge');
-        echo '<br/>';
-        echo esc_html($rep->Name2);
-        echo $after_title;
+        $displayname = $rep->Name2;
 
-        echo '<ul>';
         $url = sprintf('%s/proposal/%s/GetTop/%d', Plugin::API_HOST, $instance['id'], $instance['count']);
         $proposals = json_decode(wp_remote_retrieve_body(wp_remote_get($url)));
+        $displaydata = array();
         foreach($proposals as $prop) {
-            $status = '';
-            $color = '';
+            $data = array();
+            $data['status'] = '';
+            $data['color'] = '';
             $statusid = $prop->ID_CurrentProposalStep;
             foreach($prop->ProposalSteps as $step) {
                 if ($step->Id == $statusid) {
-                    $status = $step->ProcessStep->Caption;
-                    $color = $step->ProcessStep->Color;
+                    $data['status'] = $step->ProcessStep->Caption;
+                    $data['color'] = $step->ProcessStep->Color;
+                    break;
                 }
             }
-            echo '<li style="margin: 3px; border-radius: 2px 2px 2px 2px; padding: 5px; border-style: none ridge inset none; border-width: 1px; border-color: grey; ';
-            if (!empty($color)) {
-                echo 'background-color: '.$color.';';
-            }
-            echo '">';
-            echo '<a href="' . $prop->FullUrl . '" target="_blank">' . $prop->Title . '</a>';
-            echo '<br/>';
-            echo '<span>'. $status . '</span>';
-            echo '</li>';
+            $data['fullurl'] = $prop->FullUrl;
+            $data['title'] = $prop->Title;
+            $displaydata[] = $data;
         }
-        echo '</ul>';
-        echo $after_widget;
+        include dirname(__FILE__) . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . 'widget_display.php';
     }
 }
 

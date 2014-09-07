@@ -38,8 +38,10 @@ class Plugin
         if(version_compare(phpversion(), WP_OPENANTRAG__MINIMUM_PHP_VERSION, '<')) {
             load_plugin_textdomain('wp_openantrag');
 
-            $message = '<strong>' . sprintf(esc_html__('WP_OpenAntrag %s requires PHP %s or higher.','wp_openantrag'), WP_OPENANTRAG_VERSION, WP_OPENANTRAG__MINIMUM_PHP_VERSION) . '</strong> '
-                . sprintf(__('Please <a target="_blank" href="%1$s">upgrade PHP</a> to a current version</a>.','wp_openantrag'),'http://www.php.net');
+            $message = '<strong>'
+                . sprintf(esc_html__('WP_OpenAntrag %s ben&ouml;tigt PHP %s oder h&ouml;her.','wp_openantrag'), WP_OPENANTRAG_VERSION, WP_OPENANTRAG__MINIMUM_PHP_VERSION)
+                . '</strong><br/>'
+                . sprintf(__('Installieren Sie bitte eine aktuelle Version von <a target="_blank" href="%1$s">PHP</a>.','wp_openantrag'),'http://www.php.net');
 
             self::bail_on_activation($message);
             exit;
@@ -47,8 +49,10 @@ class Plugin
         if(version_compare($GLOBALS['wp_version'], WP_OPENANTRAG__MINIMUM_WP_VERSION,'<')){
             load_plugin_textdomain('wp_openantrag');
 
-            $message = '<strong>' . sprintf(esc_html__('WP_OpenAntrag %s requires WordPress %s or higher.','wp_openantrag'), WP_OPENANTRAG_VERSION, WP_OPENANTRAG__MINIMUM_WP_VERSION) . '</strong> '
-                . sprintf(__('Please <a target="_blank" href="%1$s">upgrade WordPress</a> to a current version</a>.','wp_openantrag'),'https://codex.wordpress.org/Upgrading_WordPress');
+            $message = '<strong>'
+                . sprintf(esc_html__('WP_OpenAntrag %s ben&ouml;tigt WordPress %s oder h&ouml;her.','wp_openantrag'), WP_OPENANTRAG_VERSION, WP_OPENANTRAG__MINIMUM_WP_VERSION)
+                . '</strong><br/>'
+                . sprintf(__('Installieren Sie bitte eine aktuelle Version von <a target="_blank" href="%1$s">WordPress</a>.','wp_openantrag'),'https://codex.wordpress.org/Upgrading_WordPress');
 
             self::bail_on_activation($message);
         }
@@ -70,31 +74,11 @@ class Plugin
     }
 
     private static function bail_on_activation( $message, $deactivate = true ) {
-?>
-<!doctype html>
-<html>
-<head>
-    <meta charset="<?php bloginfo( 'charset' ); ?>">
-    <style>
-        * {
-            text-align: center;
-            margin: 0;
-            padding: 0;
-            font-family: "Lucida Grande",Verdana,Arial,"Bitstream Vera Sans",sans-serif;
-        }
-        p {
-            margin-top: 1em;
-            font-size: 18px;
-        }
-    </style>
-<body>
-<p><?php echo $message; ?></p>
-</body>
-</html>
-<?php
+        include dirname(__FILE__) . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . 'plugin_bailout.php';
+
         if ( $deactivate ) {
             $plugins = get_option( 'active_plugins' );
-            $openantrag = plugin_basename( WP_OPENANTRAG__PLUGIN_DIR . 'akismet.php' );
+            $openantrag = plugin_basename( WP_OPENANTRAG__PLUGIN_DIR . DIRECTORY_SEPARATOR .'plugin.php' );
             $update  = false;
             foreach ( $plugins as $i => $plugin ) {
                 if ( $plugin === $openantrag ) {

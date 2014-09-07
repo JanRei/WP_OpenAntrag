@@ -12,7 +12,7 @@ echo __('Antr&auml;ge');
 ?>
 <br/>
 <?php
-echo esc_html($rep->Name2);
+echo esc_html($displayname);
 echo $after_title;
 ?>
 <ul>
