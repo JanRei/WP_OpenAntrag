@@ -45,8 +45,8 @@ define('WP_OPENANTRAG__DELETE_LIMIT',100000);
 register_activation_hook(__FILE__, function() { \WP_OpenAntrag\Plugin::plugin_activation(); });
 register_deactivation_hook(__FILE__, function() { \WP_OpenAntrag\Plugin::plugin_deactivation(); });
 
-require_once(WP_OPENANTRAG__PLUGIN_DIR . 'Plugin.php');
-require_once(WP_OPENANTRAG__PLUGIN_DIR . 'Widget.php');
+require_once(WP_OPENANTRAG__PLUGIN_DIR . 'plugin.php');
+require_once(WP_OPENANTRAG__PLUGIN_DIR . 'widget.php');
 /*
 add_action('init',array('W','init'));
 
