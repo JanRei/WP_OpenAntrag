@@ -25,23 +25,13 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
+?>
+<h2><?php echo __('Antr&auml;ge'); echo ' '; echo esc_html($displayname); ?></h2>
+<?php foreach($proposals as $prop): ?>
+    <p style="<?php echo empty($data['color'])?'':'background-color:'.$data['color']; ?>">
+    <a href="<?php echo $prop->FullUrl; ?>" target="_blank"><?php echo $prop->Title; ?></a>
+    <br/>
+    <span><?php echo $prop->status; ?></span>
+    </p>
+<?php endforeach ?>
 
-// Make sure we don't expose any info if called directly
-if(!function_exists('add_action')){
-    echo __('Ich bin nur ein Plugin. Es macht keinen Sinn, mich direkt aufzurufen', 'wp_openantrag');
-    exit;
-}
-
-define('WP_OPENANTRAG_VERSION','0.1');
-define('WP_OPENANTRAG__MINIMUM_PHP_VERSION', '5.3');
-define('WP_OPENANTRAG__MINIMUM_WP_VERSION','3.9');
-define('WP_OPENANTRAG__PLUGIN_URL',plugin_dir_url(__FILE__));
-define('WP_OPENANTRAG__PLUGIN_DIR',plugin_dir_path(__FILE__));
-define('WP_OPENANTRAG__DELETE_LIMIT',100000);
-
-register_activation_hook(__FILE__, function() { \WP_OpenAntrag\Plugin::plugin_activation(); });
-register_deactivation_hook(__FILE__, function() { \WP_OpenAntrag\Plugin::plugin_deactivation(); });
-
-require_once(WP_OPENANTRAG__PLUGIN_DIR . 'plugin.php');
-require_once(WP_OPENANTRAG__PLUGIN_DIR . 'widget.php');
-require_once(WP_OPENANTRAG__PLUGIN_DIR . 'shortcode.php');

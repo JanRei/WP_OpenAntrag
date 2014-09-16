@@ -1,10 +1,30 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: jochenschaefer
- * Date: 15.08.14
- * Time: 17:23
- */
+/*
+Plugin Name: WP_OpenAntrag
+Plugin URI: http://github.com
+Description: Display OpenAntrag
+Version: 0.1
+Author: Jochen Sch&auml;fer
+Author URI: http://www.github.com/josch1710
+License: GPLv2
+Text Domain: wp_openantrag
+*/
+
+/*
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
 
 namespace WP_OpenAntrag;
 
@@ -13,9 +33,8 @@ class Plugin
 {
     const API_HOST = 'http://openantrag.de/api';
 
-    public static function init()
-    {
-        if(!self::$initiated){
+    public static function init() {
+        if(!self::$initiated) {
             self::init_hooks();
         }
     }
@@ -23,8 +42,7 @@ class Plugin
     /**
      * Initializes WordPress hooks
      */
-    private static function init_hooks()
-    {
+    private static function init_hooks() {
         self::$initiated = true;
     }
 
@@ -33,8 +51,7 @@ class Plugin
      * Attached to activate_{ plugin_basename( __FILES__ ) } by register_activation_hook()
      * @static
      */
-    public static function plugin_activation()
-    {
+    public static function plugin_activation() {
         if(version_compare(phpversion(), WP_OPENANTRAG__MINIMUM_PHP_VERSION, '<')) {
             load_plugin_textdomain('wp_openantrag');
 
@@ -62,18 +79,16 @@ class Plugin
      * Removes all connection options
      * @static
      */
-    public static function plugin_deactivation()
-    {
+    public static function plugin_deactivation() {
         //tidy up
     }
 
-    public static function log($debug)
-    {
+    public static function log($debug) {
         if(defined('WP_DEBUG_LOG') && WP_DEBUG_LOG)
             error_log(print_r(compact('wp_openantrag_debug'),1)); //send message to debug.log when in debug mode
     }
 
-    private static function bail_on_activation( $message, $deactivate = true ) {
+    public static function bail_on_activation( $message, $deactivate = true ) {
         include dirname(__FILE__) . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . 'plugin_bailout.php';
 
         if ( $deactivate ) {
