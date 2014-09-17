@@ -86,7 +86,7 @@ class Widget extends \WP_Widget {
             $statusid = $prop->ID_CurrentProposalStep;
             foreach($prop->ProposalSteps as $step) {
                 if ($step->Id == $statusid) {
-                    $data['status'] = $step->ProcessStep->Caption;
+                    $data['status'] = $step->ProcessStep->ShortCaption;
                     $data['color'] = $step->ProcessStep->Color;
                     break;
                 }

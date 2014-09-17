@@ -25,18 +25,28 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
-var_dump('short');
 add_shortcode('wp_openantrag', 'wp_openantrag_display_shortcode');
 
 function wp_openantrag_display_shortcode($atts, $content = null) {
+    foreach ($atts as $attribute => $value) {
+        if (is_int($attribute)) {
+            $atts[strtolower($value)] = true;
+            unset($atts[$attribute]);
+        }
+    }
     extract(shortcode_atts(array(
         'parlament' => null,
-        'count' => 5
+        'count' => 5,
+        'compact' => false
     ), $atts));
+
     if (empty($parlament)) {
         \WP_OpenAntrag\Plugin::bail_on_activation('Bitte geben Sie ein Parlament an.', false);
         exit;
     }
+
+    $url = sprintf('%s/representation/GetProcessSteps/%s', \WP_OpenAntrag\Plugin::API_HOST, $parlament);
+    $steps = json_decode(wp_remote_retrieve_body(wp_remote_get($url)));
 
     $url = sprintf('%s/representation/GetByKey/%s', \WP_OpenAntrag\Plugin::API_HOST, $parlament);
     $rep = json_decode(wp_remote_retrieve_body(wp_remote_get($url)));
@@ -50,8 +60,18 @@ function wp_openantrag_display_shortcode($atts, $content = null) {
         $statusid = $prop->ID_CurrentProposalStep;
         foreach($prop->ProposalSteps as $step) {
             if ($step->Id == $statusid) {
-                $prop->status = $step->ProcessStep->Caption;
+                $prop->status = $step->ProcessStep->ShortCaption;
                 $prop->color = $step->ProcessStep->Color;
+                // Nächste Schritte suchen
+                $prop->nextstatus = array();
+                $prop->nextcolor = array();
+                $nextsteps = explode(',', $step->ProcessStep->ID_NextSteps);
+                foreach($steps as $_step) {
+                    if (in_array($_step->ID, $nextsteps)) {
+                        $prop->nextstatus[] = $_step->ShortCaption;
+                        $prop->nextcolor[] = $_step->Color;
+                    }
+                }
                 break;
             }
         }

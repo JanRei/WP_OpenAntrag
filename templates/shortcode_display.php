@@ -28,10 +28,25 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ?>
 <h2><?php echo __('Antr&auml;ge'); echo ' '; echo esc_html($displayname); ?></h2>
 <?php foreach($proposals as $prop): ?>
-    <p style="<?php echo empty($data['color'])?'':'background-color:'.$data['color']; ?>">
-    <a href="<?php echo $prop->FullUrl; ?>" target="_blank"><?php echo $prop->Title; ?></a>
+    <div style="margin-bottom: 2em;">
+    <a href="<?php echo $prop->FullUrl; ?>" target="_blank"><?php echo esc_html($prop->Title); ?></a>
     <br/>
-    <span><?php echo $prop->status; ?></span>
-    </p>
+    Aktueller Status:
+    <span <?php echo empty($prop->color)?'':'style="background-color:'.$prop->color.'"'; ?>><?php echo $prop->status; ?></span> <br/>
+<?php if (!empty($prop->nextstatus)): ?>
+    <span>N&auml;chste Schritte:</span><ul>
+    <?php foreach($prop->nextstatus as $i => $status): ?>
+        <li>
+            <span <?php echo empty($prop->nextcolor[$i])?'':'style="background-color:'.$prop->nextcolor[$i].'"'; ?>>
+            <?php echo $status; ?>
+            <span/>
+        </li>
+    <?php endforeach; ?>
+    </ul>
+<?php endif;
+    if (!$compact):
+        echo $prop->TextHtml;
+    endif; ?>
+    </div>
 <?php endforeach ?>
 
