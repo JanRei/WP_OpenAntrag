@@ -34,7 +34,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
     Aktueller Status:
     <span <?php echo empty($prop->color)?'':'style="background-color:'.$prop->color.'"'; ?>><?php echo $prop->status; ?></span> <br/>
 <?php if (!empty($prop->nextstatus)): ?>
-    <span>N&auml;chste Schritte:</span><ul>
+    <span>M&ouml;gliche n&auml;chste Schritte:</span><ul>
     <?php foreach($prop->nextstatus as $i => $status): ?>
         <li>
             <span <?php echo empty($prop->nextcolor[$i])?'':'style="background-color:'.$prop->nextcolor[$i].'"'; ?>>

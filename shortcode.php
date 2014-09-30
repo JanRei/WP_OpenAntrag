@@ -62,7 +62,6 @@ function wp_openantrag_display_shortcode($atts, $content = null) {
             if ($step->Id == $statusid) {
                 $prop->status = $step->ProcessStep->ShortCaption;
                 $prop->color = $step->ProcessStep->Color;
-                // Nächste Schritte suchen
                 $prop->nextstatus = array();
                 $prop->nextcolor = array();
                 $nextsteps = explode(',', $step->ProcessStep->ID_NextSteps);
