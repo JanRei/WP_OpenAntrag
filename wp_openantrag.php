@@ -38,6 +38,7 @@ define('WP_OPENANTRAG__MINIMUM_WP_VERSION','3.9');
 define('WP_OPENANTRAG__PLUGIN_URL',plugin_dir_url(__FILE__));
 define('WP_OPENANTRAG__PLUGIN_DIR',plugin_dir_path(__FILE__));
 define('WP_OPENANTRAG__DELETE_LIMIT',100000);
+define('WP_OPENANTRAG__CACHE_TIME',30*MINUTE_IN_SECONDS);
 
 register_activation_hook(__FILE__, function() { \WP_OpenAntrag\Plugin::plugin_activation(); });
 register_deactivation_hook(__FILE__, function() { \WP_OpenAntrag\Plugin::plugin_deactivation(); });

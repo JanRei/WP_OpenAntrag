@@ -23,6 +23,14 @@ echo __('Antr&auml;ge');
 <?php
 echo esc_html($displayname);
 echo $after_title;
+if ($displayerror) {
+    if ($displayerrormessage) {
+        esc_html_e( sprintf( 'Fehler bei der Anfrage an openantrag.de: %s', $displayerrormessage) , 'wp_openantrag');
+    } else {
+        esc_html_e( 'Unbekannter Fehler bei der Anfrage an openantrag.de.' , 'wp_openantrag');
+    }
+} else {
+    if (count($displaydata)) {
 ?>
 <ul>
 <?php foreach($displaydata as $data): ?>
@@ -34,5 +42,9 @@ echo $after_title;
 <?php endforeach ?>
 </ul>
 <?php
+    } else {
+        esc_html_e( 'Keine Antr&auml;ge vorhanden' , 'wp_openantrag');
+    }
+}
 echo $after_widget;
 ?>

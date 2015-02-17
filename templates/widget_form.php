@@ -16,8 +16,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 ?>
 <p>
-    <label for="<?php echo $this->get_field_id( 'id' ); ?>"><?php esc_html_e( 'Parlament:' , 'wp_openantrag'); ?></label>
-    <input class="widefat" id="<?php echo $this->get_field_id( 'id' ); ?>" name="<?php echo $this->get_field_name( 'id' ); ?>" type="text" value="<?php echo esc_attr( $id ); ?>" />
+    <label for="<?php echo $this->get_field_id( 'parliament' ); ?>"><?php esc_html_e( 'Parlament:' , 'wp_openantrag'); ?></label>
+    <input class="widefat" id="<?php echo $this->get_field_id( 'parliament' ); ?>" name="<?php echo $this->get_field_name( 'parliament' ); ?>" type="text" value="<?php echo esc_attr( $parliament ); ?>" />
 </p>
 <p>
     <label for="<?php echo $this->get_field_id( 'count' ); ?>"><?php esc_html_e( 'Anzahl Antr&auml;ge:' , 'wp_openantrag'); ?></label>

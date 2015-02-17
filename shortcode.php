@@ -31,41 +31,54 @@ function wp_openantrag_display_shortcode($atts, $content = null) {
     ), $atts));
 
     if (empty($parlament)) {
-        \WP_OpenAntrag\Plugin::bail_on_activation('Bitte geben Sie ein Parlament an.', false);
-        exit;
+        return esc_html__( 'Bitte geben Sie ein Parlament an.' , 'wp_openantrag');;
     }
 
-    $url = sprintf('%s/representation/GetProcessSteps/%s', \WP_OpenAntrag\Plugin::API_HOST, $parlament);
-    $steps = json_decode(wp_remote_retrieve_body(wp_remote_get($url)));
+    $transient_name = 'openantrag_' . md5(serialize($atts));
 
-    $url = sprintf('%s/representation/GetByKey/%s', \WP_OpenAntrag\Plugin::API_HOST, $parlament);
-    $rep = json_decode(wp_remote_retrieve_body(wp_remote_get($url)));
-    $displayname = $rep->Name2;
+    if (false === ($shortcode_output = get_transient($transient_name))) {
+        $steps = \WP_OpenAntrag\Plugin::openantrag_parliament_getprocesssteps($parlament);
+        $displayname = \WP_OpenAntrag\Plugin::openantrag_parliament_getdisplayname($parlament);
 
-    $url = sprintf('%s/proposal/%s/GetTop/%d', \WP_OpenAntrag\Plugin::API_HOST, $parlament, $count);
-    $proposals = (array)json_decode(wp_remote_retrieve_body(wp_remote_get($url)));
-    foreach($proposals as $prop) {
-        $prop->status = '';
-        $prop->color = '';
-        $statusid = $prop->ID_CurrentProposalStep;
-        foreach($prop->ProposalSteps as $step) {
-            if ($step->Id == $statusid) {
-                $prop->status = $step->ProcessStep->ShortCaption;
-                $prop->color = $step->ProcessStep->Color;
-                $prop->nextstatus = array();
-                $prop->nextcolor = array();
-                $nextsteps = explode(',', $step->ProcessStep->ID_NextSteps);
-                foreach($steps as $_step) {
-                    if (in_array($_step->ID, $nextsteps)) {
-                        $prop->nextstatus[] = $_step->ShortCaption;
-                        $prop->nextcolor[] = $_step->Color;
+        $displayerror = false;
+        $displayerrormessage = '';
+        $proposals = array();
+
+        try {
+            $proposals = \WP_OpenAntrag\Plugin::openantrag_parliament_getproposals($parlament, $count);
+        } catch (\Exception $e) {
+            $displayerror = true;
+            $displayerrormessage = $e->getMessage();
+        }
+
+        foreach($proposals as $prop) {
+            $prop->status = '';
+            $prop->color = '';
+            $statusid = $prop->ID_CurrentProposalStep;
+            foreach($prop->ProposalSteps as $step) {
+                if ($step->Id == $statusid) {
+                    $prop->status = $step->ProcessStep->ShortCaption;
+                    $prop->color = $step->ProcessStep->Color;
+                    $prop->nextstatus = array();
+                    $prop->nextcolor = array();
+                    $nextsteps = explode(',', $step->ProcessStep->ID_NextSteps);
+                    foreach($steps as $_step) {
+                        if (in_array($_step->ID, $nextsteps)) {
+                            $prop->nextstatus[] = $_step->ShortCaption;
+                            $prop->nextcolor[] = $_step->Color;
+                        }
                     }
+                    break;
                 }
-                break;
             }
         }
+
+        ob_start();
+        include dirname(__FILE__) . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . 'shortcode_display.php';
+        $shortcode_output = ob_get_clean();
+
+        set_transient($transient_name, $shortcode_output, WP_OPENANTRAG__CACHE_TIME);
     }
-    ob_start();
-    include dirname(__FILE__) . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . 'shortcode_display.php';
-    return ob_get_clean();
+
+    return $shortcode_output;
 }

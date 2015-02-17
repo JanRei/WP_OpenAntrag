@@ -16,7 +16,16 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 ?>
 <h2><?php echo __('Antr&auml;ge'); echo ' '; echo esc_html($displayname); ?></h2>
-<?php foreach($proposals as $prop): ?>
+<?php
+if ($displayerror) {
+    if ($displayerrormessage) {
+        esc_html_e( sprintf( 'Fehler bei der Anfrage an openantrag.de: %s', $displayerrormessage) , 'wp_openantrag');
+    } else {
+        esc_html_e( 'Unbekannter Fehler bei der Anfrage an openantrag.de.' , 'wp_openantrag');
+    }
+} else {
+    if (count($proposals)) {
+ foreach($proposals as $prop): ?>
     <div style="margin-bottom: 2em;">
     <a href="<?php echo $prop->FullUrl; ?>" target="_blank"><?php echo esc_html($prop->Title); ?></a>
     <br/>
@@ -37,5 +46,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
         echo $prop->TextHtml;
     endif; ?>
     </div>
-<?php endforeach ?>
-
+<?php endforeach;
+    } else {
+        esc_html_e( 'Keine Antr&auml;ge vorhanden' , 'wp_openantrag');
+    }
+}
+?>
