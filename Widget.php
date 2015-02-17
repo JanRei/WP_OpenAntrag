@@ -1,16 +1,5 @@
 <?php
 /*
-Plugin Name: WP_OpenAntrag
-Plugin URI: http://github.com
-Description: Display OpenAntrag
-Version: 0.1
-Author: Jochen Sch&auml;fer
-Author URI: http://www.github.com/josch1710
-License: GPLv2
-Text Domain: wp_openantrag
-*/
-
-/*
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
 as published by the Free Software Foundation; either version 2
@@ -25,7 +14,6 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
-
 
 namespace WP_OpenAntrag;
 
