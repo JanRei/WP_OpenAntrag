@@ -1,16 +1,5 @@
 <?php
 /*
-Plugin Name: WP_OpenAntrag
-Plugin URI: http://github.com
-Description: Display OpenAntrag
-Version: 0.1
-Author: Jochen Sch&auml;fer
-Author URI: http://www.github.com/josch1710
-License: GPLv2
-Text Domain: wp_openantrag
-*/
-
-/*
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
 as published by the Free Software Foundation; either version 2
@@ -34,6 +23,14 @@ echo __('Antr&auml;ge');
 <?php
 echo esc_html($displayname);
 echo $after_title;
+if ($displayerror) {
+    if ($displayerrormessage) {
+        esc_html_e( sprintf( 'Fehler bei der Anfrage an openantrag.de: %s', $displayerrormessage) , 'wp_openantrag');
+    } else {
+        esc_html_e( 'Unbekannter Fehler bei der Anfrage an openantrag.de.' , 'wp_openantrag');
+    }
+} else {
+    if (count($displaydata)) {
 ?>
 <ul>
 <?php foreach($displaydata as $data): ?>
@@ -45,5 +42,9 @@ echo $after_title;
 <?php endforeach ?>
 </ul>
 <?php
+    } else {
+        esc_html_e( 'Keine Antr&auml;ge vorhanden' , 'wp_openantrag');
+    }
+}
 echo $after_widget;
 ?>

@@ -1,16 +1,5 @@
 <?php
 /*
-Plugin Name: WP_OpenAntrag
-Plugin URI: http://github.com
-Description: Display OpenAntrag
-Version: 0.1
-Author: Jochen Sch&auml;fer
-Author URI: http://www.github.com/josch1710
-License: GPLv2
-Text Domain: wp_openantrag
-*/
-
-/*
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
 as published by the Free Software Foundation; either version 2
@@ -88,6 +77,76 @@ class Plugin
             error_log(print_r(compact('wp_openantrag_debug'),1)); //send message to debug.log when in debug mode
     }
 
+    /**
+     * Performs an API request
+     * @param $url Complete URL for the API request
+     * @return JSON decoded response as object, throws an exception in case of failure
+     * @static
+     */
+    private static function openantrag_request($url) {
+        $response = wp_remote_get($url);
+
+        if (is_wp_error($response)) {
+            throw new \Exception($response->get_error_message());
+        } elseif (wp_remote_retrieve_body($response) == '' || $response['response']['code'] != 200) {
+            throw new \Exception($response['response']['message']);
+        } else {
+            return json_decode(wp_remote_retrieve_body($response));
+        }
+    }
+
+    /**
+     * Get the display name for a parliament (by sending a request to OpenAntrag)
+     * @param $parliament Key of the parliament
+     * @return Display name, or key in case of failure
+     * @static
+     */
+    public static function openantrag_parliament_getdisplayname($parliament) {
+        $url = sprintf('%s/representation/GetByKey/%s', self::API_HOST, $parliament);
+        try {
+            $response = self::openantrag_request($url);
+            return $response->Name2;
+        } catch (\Exception $e) {
+            return $parliament;
+        }
+    }
+
+    /**
+     * Get the possible process steps for a parliament (by sending a request to OpenAntrag)
+     * @param $parliament Key of the parliament
+     * @return Array of objects containing the steps, or empty array in case of failure
+     * @static
+     */
+    public static function openantrag_parliament_getprocesssteps($parliament) {
+        $url = sprintf('%s/representation/GetProcessSteps/%s', self::API_HOST, $parliament);
+        try { 
+            $response = self::openantrag_request($url);
+            return $response;
+        } catch (\Exception $e) {
+            return array();
+        }
+    }
+
+    /**
+     * Get the latest proposals for a parliament (by sending a request to OpenAntrag)
+     * @param $parliament Key of the parliament
+     * @param $count Maximum number of proposals to be returned
+     * @return Array of proposals, throws an exception in case of failure
+     * @static
+     */
+    public static function openantrag_parliament_getproposals($parliament, $count) {
+        $url = sprintf('%s/proposal/%s/GetTop/%d', self::API_HOST, $parliament, $count);
+        $response = self::openantrag_request($url);
+        $proposals = $response;
+        return $proposals;
+    }
+
+    /**
+     * To be called when plugin cannot be activated, shows an error message
+     * @param $message Error message to be shown
+     * @param $deactivate Optional. If true (default) plugin gets deactivated, otherwise plugin stays enabled
+     * @static
+     */
     public static function bail_on_activation( $message, $deactivate = true ) {
         include dirname(__FILE__) . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . 'plugin_bailout.php';
 

@@ -1,16 +1,5 @@
 <?php
 /*
-Plugin Name: WP_OpenAntrag
-Plugin URI: http://github.com
-Description: Display OpenAntrag
-Version: 0.1
-Author: Jochen Sch&auml;fer
-Author URI: http://www.github.com/josch1710
-License: GPLv2
-Text Domain: wp_openantrag
-*/
-
-/*
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
 as published by the Free Software Foundation; either version 2
@@ -25,7 +14,6 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
-
 
 namespace WP_OpenAntrag;
 
@@ -43,12 +31,12 @@ class Widget extends \WP_Widget {
     }
 
     public function form( $instance ) {
-        if ( $instance['id'] ) {
-            $id = $instance['id'];
+        if ( !empty($instance['parliament']) ) {
+            $parliament = $instance['parliament'];
         } else {
-            $id = '';
+            $parliament = '';
         }
-        if ( $instance['count'] ) {
+        if ( !empty($instance['count']) ) {
             $count = $instance['count'];
         } else {
             $count = 5;
@@ -57,12 +45,15 @@ class Widget extends \WP_Widget {
     }
 
     public function update( $new_instance, $old_instance ) {
-        $instance['id'] = strip_tags( $new_instance['id'] );
-        if (empty($instance['id'])) {
-            // TODO throw new \Exception(__('Parlament darf nicht leer sein', 'wp_openantrag'));
+        $instance = array();
+        if (!empty($new_instance['parliament'])) {
+            $instance['parliament'] = strip_tags( $new_instance['parliament'] );
+        } else {
+            $instance['parliament'] = '';
         }
-        $instance['count'] = strip_tags( $new_instance['count']);
-        if (!is_numeric($instance['count'])) {
+        if (!empty($new_instance['count']) && intval($new_instance['count']) > 0) {
+            $instance['count'] = intval($new_instance['count']);
+        } else {
             $instance['count'] = 5;
         }
         return $instance;
@@ -70,32 +61,58 @@ class Widget extends \WP_Widget {
 
     public function widget( $args, $instance ) {
         extract($args);
-        echo $before_widget;
 
-        $url = sprintf('%s/representation/GetByKey/%s', Plugin::API_HOST, $instance['id']);
-        $rep = json_decode(wp_remote_retrieve_body(wp_remote_get($url)));
-        $displayname = $rep->Name2;
-
-        $url = sprintf('%s/proposal/%s/GetTop/%d', Plugin::API_HOST, $instance['id'], $instance['count']);
-        $proposals = json_decode(wp_remote_retrieve_body(wp_remote_get($url)));
-        $displaydata = array();
-        foreach($proposals as $prop) {
-            $data = array();
-            $data['status'] = '';
-            $data['color'] = '';
-            $statusid = $prop->ID_CurrentProposalStep;
-            foreach($prop->ProposalSteps as $step) {
-                if ($step->Id == $statusid) {
-                    $data['status'] = $step->ProcessStep->ShortCaption;
-                    $data['color'] = $step->ProcessStep->Color;
-                    break;
-                }
-            }
-            $data['fullurl'] = $prop->FullUrl;
-            $data['title'] = $prop->Title;
-            $displaydata[] = $data;
+        if (!empty($instance['parliament'])) {
+            $parliament = $instance['parliament'];
+        } else {
+            return;
         }
-        include dirname(__FILE__) . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . 'widget_display.php';
+        if (!empty($instance['count']) && intval($instance['count']) > 0) {
+            $count = intval($instance['count']);
+        } else {
+            $count = 5;
+        }
+
+        $transient_name = 'openantrag_' . md5(serialize($instance));
+
+        if (false === ($widget_output = get_transient($transient_name))) {
+            $displayname = \WP_OpenAntrag\Plugin::openantrag_parliament_getdisplayname($parliament);
+
+            $displayerror = false;
+            $displayerrormessage = '';
+            $proposals = array();
+
+            try {
+                $proposals = \WP_OpenAntrag\Plugin::openantrag_parliament_getproposals($parliament, $count);
+            } catch (\Exception $e) {
+                $displayerror = true;
+                $displayerrormessage = $e->getMessage();
+            }
+
+            foreach($proposals as $prop) {
+                $data = array();
+                $data['status'] = '';
+                $data['color'] = '';
+                $statusid = $prop->ID_CurrentProposalStep;
+                foreach($prop->ProposalSteps as $step) {
+                    if ($step->Id == $statusid) {
+                        $data['status'] = $step->ProcessStep->ShortCaption;
+                        $data['color'] = $step->ProcessStep->Color;
+                        break;
+                    }
+                }
+                $data['fullurl'] = $prop->FullUrl;
+                $data['title'] = $prop->Title;
+                $displaydata[] = $data;
+            }
+
+            ob_start();
+            include dirname(__FILE__) . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . 'widget_display.php';
+            $widget_output = ob_get_clean();
+
+            set_transient($transient_name, $widget_output, WP_OPENANTRAG__CACHE_TIME);
+        }
+        echo $widget_output;
     }
 }
 
