@@ -43,6 +43,6 @@ define('WP_OPENANTRAG__CACHE_TIME',30*MINUTE_IN_SECONDS);
 register_activation_hook(__FILE__, function() { \WP_OpenAntrag\Plugin::plugin_activation(); });
 register_deactivation_hook(__FILE__, function() { \WP_OpenAntrag\Plugin::plugin_deactivation(); });
 
-require_once(WP_OPENANTRAG__PLUGIN_DIR . 'plugin.php');
-require_once(WP_OPENANTRAG__PLUGIN_DIR . 'widget.php');
+require_once(WP_OPENANTRAG__PLUGIN_DIR . 'Plugin.php');
+require_once(WP_OPENANTRAG__PLUGIN_DIR . 'Widget.php');
 require_once(WP_OPENANTRAG__PLUGIN_DIR . 'shortcode.php');
