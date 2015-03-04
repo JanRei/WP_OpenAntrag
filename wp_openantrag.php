@@ -1,10 +1,10 @@
 <?php
 /*
 Plugin Name: WP_OpenAntrag
-Plugin URI: http://github.com
+Plugin URI: http://github.com/josch1710
 Description: Display OpenAntrag
-Version: 0.1
-Author: Jochen Sch&auml;fer
+Version: 0.2
+Author: Jochen Sch&auml;fer; Jan Reinighaus
 Author URI: http://www.github.com/josch1710
 License: GPLv2
 Text Domain: wp_openantrag
@@ -32,7 +32,7 @@ if(!function_exists('add_action')){
     exit;
 }
 
-define('WP_OPENANTRAG_VERSION','0.1');
+define('WP_OPENANTRAG_VERSION','0.2');
 define('WP_OPENANTRAG__MINIMUM_PHP_VERSION', '5.3');
 define('WP_OPENANTRAG__MINIMUM_WP_VERSION','3.9');
 define('WP_OPENANTRAG__PLUGIN_URL',plugin_dir_url(__FILE__));
